@@ -1,0 +1,49 @@
+Program.Sub.ScreenSU.Start
+
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+
+V.Local.iPID.Declare
+V.Local.sSQL.Declare
+
+'EDI ASN populate hook
+'f.Intrinsic.Control.If(v.Caller.Hook,=,"00037510")
+'	v.Passed.00064.Set("0000231")
+'	v.Passed.00065.Set("0003")
+'f.Intrinsic.Control.Else
+
+
+'Shipment Post Hook
+f.Intrinsic.Control.If(v.Caller.Hook,=,"28532")
+	F.ODBC.Connection!con.OpenCompanyConnection(300)
+	f.Intrinsic.String.Build("select Flag_EDI_ASN from v_CUSTOMER_SHIPTO   where customer = '{0}'",Variable.Passed.000204,V.Local.sSQL)
+	F.ODBC.Connection!con.OpenLocalRecordsetRO("rst",V.Local.sSQL)
+	F.Intrinsic.Control.If(V.ODBC.con!rst.EOF,=,False)
+		f.Intrinsic.Control.If(V.ODBC.con!rst.FieldVal!Flag_EDI_ASN,=,"Y")
+			F.Global.General.LaunchMenuTask(668,0,V.Local.iPID)
+		f.Intrinsic.Control.endif	
+	f.Intrinsic.Control.endif
+	f.ODBC.Connection!con.Close
+f.Intrinsic.Control.endif
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End 
+F.Intrinsic.Control.EndTry
+
+Program.Sub.Main.End
+
+
+
+
+Program.Sub.Comments.Start
+${$0$}$$}$$}$12/5/2018 9:48:24 AM$}$False
+Program.Sub.Comments.End
